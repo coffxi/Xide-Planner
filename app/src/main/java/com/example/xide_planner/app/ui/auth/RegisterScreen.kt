@@ -11,8 +11,15 @@ import com.example.xide_planner.app.viewmodel.AuthState
 @Composable
 fun RegisterScreen(
     state: AuthState,
-    onGoogleClick: () -> Unit
+    onGoogleClick: () -> Unit,
+    onSuccess: () -> Unit = {} // ← nuevo parámetro
 ) {
+
+    // 🔹 Si el login fue exitoso: navegamos
+    if (state is AuthState.Success) {
+        onSuccess()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -21,30 +28,32 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            text = "Crear cuenta",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
+        Text(text = "Crear cuenta", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "Organiza tus planes con Xide",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
+        Text(text = "Organiza tus planes con Xide", style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             onClick = onGoogleClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = state !is AuthState.Loading // desactivar mientras carga
         ) {
             Text(text = "Registrarse con Google")
         }
 
+        // 🔹 Loader
         if (state is AuthState.Loading) {
             Spacer(modifier = Modifier.height(16.dp))
             CircularProgressIndicator()
+        }
+
+        // 🔹 Error
+        if (state is AuthState.Error) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Error: ${state.message}",
+                color = MaterialTheme.colorScheme.error
+            )
         }
     }
 }

@@ -64,6 +64,9 @@ dependencies {
 
     // ---- ViewModel para Compose (REQUIRED) ----
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.ui.text)
 
     // ---- Test ----
     testImplementation(libs.junit)

@@ -16,7 +16,7 @@ fun Button1(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
-) {
+    ) {
     Button(
         onClick = onClick,
         modifier = modifier

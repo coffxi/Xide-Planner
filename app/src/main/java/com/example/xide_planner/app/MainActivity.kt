@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.xide_planner.app.ui.auth.RegisterScreen
+import com.example.xide_planner.app.ui.tasks.CreateTaskScreen
 import com.example.xide_planner.app.viewmodel.AuthViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
                     authViewModel.onGoogleLoginClick()
                 }
             )
+            CreateTaskScreen()
         }
     }
 }

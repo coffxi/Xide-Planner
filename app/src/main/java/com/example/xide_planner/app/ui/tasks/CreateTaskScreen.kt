@@ -1,8 +1,12 @@
 package com.example.xide_planner.app.ui.tasks
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,18 +53,30 @@ fun CreateTaskScreen() {
     var showDatePicker by remember { mutableStateOf(false) }
     var showRepeatDialog by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showReminderDialog by remember { mutableStateOf(false) }
+    var showTagDialog by remember { mutableStateOf(false) }
+    var showAddTagDialog by remember { mutableStateOf(false) }
 
     var selectedDateMillis by remember { mutableStateOf<Long?>(null) }
     var selectedHour by remember {
-        mutableStateOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
-    }
+        mutableStateOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) }
     var selectedMinute by remember {
-        mutableStateOf(Calendar.getInstance().get(Calendar.MINUTE))
-    }
+        mutableStateOf(Calendar.getInstance().get(Calendar.MINUTE)) }
 
+    var tagsList by remember {
+        mutableStateOf(
+            mutableListOf(
+                "Sin etiqueta",
+                "Escuela",
+                "Trabajo",
+                "Personal"
+            )
+        )
+    }
+    var newTagName by remember { mutableStateOf("") }
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDateMillis ?: todayAtMidnight()
-    )
+        initialSelectedDateMillis = selectedDateMillis ?: todayAtMidnight())
+    val listState = rememberLazyListState()
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -181,18 +198,16 @@ fun CreateTaskScreen() {
                         Icons.Filled.Notifications,
                         "Recordatorio",
                         reminderOption
-                    ) {}
+                    ) { showReminderDialog = true }
 
                     OptionRow(
                         Icons.Filled.Description,
                         "Etiqueta",
                         tagsOption
-                    ) {}
+                    ) { showTagDialog = true }
                 }
             }
-
             Spacer(modifier = Modifier.height(18.dp))
-
             Image(
                 painter = painterResource(R.drawable.tareas1),
                 contentDescription = null,
@@ -242,28 +257,41 @@ fun CreateTaskScreen() {
 
         /* ───────── REPEAT DIALOG ───────── */
         if (showRepeatDialog) {
-            AlertDialog(
+            Dialog(
                 onDismissRequest = { showRepeatDialog = false },
-                confirmButton = {},
-                title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f)
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp)
                     ) {
-                        Text("Repetir tarea")
 
-                        IconButton(onClick = { showRepeatDialog = false }) {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = "Cerrar",
-                                tint = Color(0xFFA44683)
+                        // ───── HEADER ─────
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Repetir tarea",
+                                style = MaterialTheme.typography.titleLarge
                             )
+                            IconButton(onClick = { showRepeatDialog = false }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = "Cerrar",
+                                    tint = Color(0xFFA44683)
+                                )
+                            }
                         }
-                    }
-                },
-                text = {
-                    Column {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        // ───── OPCIONES ─────
                         listOf(
                             "No repetir",
                             "Diariamente",
@@ -275,9 +303,15 @@ fun CreateTaskScreen() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { repeatOption = option }
-                                    .padding(vertical = 12.dp),
+                                    .padding(vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Text(
+                                    text = option,
+                                    color = Color(0xFFA44683),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f)
+                                )
                                 RadioButton(
                                     selected = repeatOption == option,
                                     onClick = { repeatOption = option },
@@ -285,13 +319,11 @@ fun CreateTaskScreen() {
                                         selectedColor = Color(0xFFA44683)
                                     )
                                 )
-                                Spacer(Modifier.width(8.dp))
-                                Text(option)
                             }
                         }
                     }
                 }
-            )
+            }
         }
 
         /* ───────── TIME PICKER ───────── */
@@ -330,7 +362,8 @@ fun CreateTaskScreen() {
                         Text(
                             text = if (isTimeEnabled)
                                 "Hacerlo ${timePrefix(selectedHour)} ${
-                                    formatTime(selectedHour, selectedMinute
+                                    formatTime(
+                                        selectedHour, selectedMinute
                                     )
                                 }"
                             else
@@ -440,9 +473,265 @@ fun CreateTaskScreen() {
                 }
             }
         }
+
+        /* ───────── REMINDER DIALOG ───────── */
+        if (showReminderDialog) {
+            Dialog(
+                onDismissRequest = { showReminderDialog = false },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Card(
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth(1f)   // ancho
+                        .wrapContentHeight()   // alto automático
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp)
+                    ) {
+                        // ───── Header con X ─────
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Recordatorio",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            IconButton(onClick = { showReminderDialog = false }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = "Cerrar",
+                                    tint = Color(0xFFA44683)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        val reminderOptions = listOf(
+                            "Sin aviso" to "",
+                            "Recordatorio de la mañana" to "09:00 am",
+                            "Recordatorio del medio día" to "12:00 pm",
+                            "Recordatorio de la tarde" to "04:00 pm",
+                            "Recordatorio de la noche" to "08:00 pm"
+                        )
+                        reminderOptions.forEach { (option, time) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { reminderOption = option }
+                                    .padding(vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // ─── Texto principal (izquierda)
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = option,
+                                        color = Color(0xFFA44683), // vino
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                                // ─── Hora (derecha)
+                                if (time.isNotEmpty()) {
+                                    Text(
+                                        text = "($time)",
+                                        color = Color.Gray,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(end = 8.dp),
+                                        textAlign = TextAlign.End
+                                    )
+                                }
+                                // ─── RadioButton
+                                RadioButton(
+                                    selected = reminderOption == option,
+                                    onClick = { reminderOption = option },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = Color(0xFFA44683)
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        /* ───────── TAG DIALOG ───────── */
+        if (showTagDialog) {
+            Dialog(
+                onDismissRequest = { showTagDialog = false },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f)
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+
+                        // ───── HEADER ─────
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Etiqueta",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+
+                            IconButton(onClick = { showTagDialog = false }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = "Cerrar",
+                                    tint = Color(0xFFA44683)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // ───── CONTENEDOR SCROLLEABLE ─────
+                        val listState = rememberLazyListState()
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 320.dp) // 👈 el dialog crece hasta aquí
+                        ) {
+
+                            LazyColumn(
+                                state = listState,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+
+                                items(tagsList) { option ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { tagsOption = option }
+                                            .padding(vertical = 14.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = option,
+                                            color = Color(0xFFA44683),
+                                            modifier = Modifier.weight(1f)
+                                        )
+
+                                        RadioButton(
+                                            selected = tagsOption == option,
+                                            onClick = { tagsOption = option },
+                                            colors = RadioButtonDefaults.colors(
+                                                selectedColor = Color(0xFFA44683)
+                                            )
+                                        )
+                                    }
+                                }
+
+                                // ───── BOTÓN AGREGAR ─────
+                                item {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Button1(
+                                            text = "Agregar Nueva Etiqueta",
+                                            onClick = { showAddTagDialog = true },
+                                            modifier = Modifier.width(270.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            // ───── INDICADOR DE MÁS CONTENIDO ─────
+                            if (listState.canScrollForward) {
+                                Icon(
+                                    imageVector = Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = Color.LightGray,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = 4.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        /* ───────── ADD TAG DIALOG ───────── */
+        if (showAddTagDialog) {
+            Dialog(
+                onDismissRequest = { showAddTagDialog = false },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+
+                        // ───── HEADER ─────
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "Nueva Etiqueta",
+                                style = MaterialTheme.typography.bodyLarge)
+
+                            IconButton(onClick = { showAddTagDialog = false }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = "Cerrar",
+                                    tint = Color(0xFFA44683)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CenteredInputField(
+                            value = newTagName,
+                            placeholder = "Nombre de la etiqueta",
+                            onValueChange = { newTagName = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Button1(
+                                text = "Guardar",
+                                onClick = {
+                                    if (newTagName.isNotBlank()) {
+                                        tagsList = (tagsList + newTagName).toMutableList()
+                                        tagsOption = newTagName
+                                        newTagName = ""
+                                        showAddTagDialog = false
+                                    }
+                                }, modifier = Modifier.width(160.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
-/* ───────── HELPERS ───────── */
+        /* ───────── HELPERS ───────── */
 
 fun formatDate(millis: Long?): String {
     if (millis == null) return "Hoy"

@@ -17,6 +17,7 @@ import com.example.xide_planner.app.ui.theme.AppThemeType
 import com.example.xide_planner.app.ui.theme.getThemeConfig
 import com.example.xide_planner.app.viewmodel.AuthViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.xide_planner.app.ui.notes.CreateNoteScreen
 import com.example.xide_planner.app.ui.theme.XidePlannerTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
             AppBackground(theme = themeConfig) {
 
                 // aquí va tu navegación o pantalla
-                CreateTaskScreen()
+                CreateNoteScreen()
             }
         }
     }

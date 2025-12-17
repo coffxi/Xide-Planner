@@ -17,10 +17,11 @@ import com.example.xide_planner.app.ui.theme.getThemeConfig
 import com.example.xide_planner.app.viewmodel.AuthState
 
 @Composable
-fun RegisterScreen(
+fun LoginScreen(
     state: AuthState,
     onGoogleClick: () -> Unit,
-    onSuccess: () -> Unit = {}
+    onSuccess: () -> Unit = {},
+    onRegisterClick: () -> Unit
 ) {
     if (state is AuthState.Success) onSuccess()
 
@@ -34,50 +35,47 @@ fun RegisterScreen(
                 .padding(bottom = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Spacer(modifier = Modifier.weight(1f))
 
-            AuthCard(
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
+            AuthCard(modifier = Modifier.padding(bottom = 16.dp)) {
 
-                // ——— TITULO ———
+                // 🌟 TÍTULO
                 Text(
-                    text = "Crear Cuenta",
+                    text = "Iniciar Sesión",
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // ——— SUBTÍTULO ROSITA ———
+                // 🌸 SUBTÍTULO ROSITA
                 Text(
-                    text = "Organización inteligente para mentes creativas.",
+                    text = "Bienvenido de vuelta, planifiquemos tu día.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.tertiary,   // 💗 ROSITA
+                    color = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // ——— TEXTO MÁS PEQUEÑO ———
+                // Texto extra (más pequeño)
                 Text(
-                    text = "¿Listo para continuar?",
-                    style = MaterialTheme.typography.titleMedium, // 🔽 más pequeño
+                    text = "Accede con Google para continuar.",
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(28.dp))
 
                 Text(
-                    text = "Registrarse con.",
+                    text = "Iniciar sesión con:",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(58.dp))
 
+                // ⭐ Imagen Google
                 Image(
                     painter = painterResource(id = R.drawable.google),
                     contentDescription = null,
@@ -88,16 +86,16 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // ——— BOTÓN ———
+                // ⭐ BOTÓN Google
                 Button1(
-                    text = "Registrarse con Google",
+                    text = "Continuar con Google",
                     onClick = onGoogleClick,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // ——— LINEA SEPARADORA ———
+                // ⭐ LINEA SEPARADORA
                 Divider(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
@@ -106,19 +104,33 @@ fun RegisterScreen(
                         .fillMaxWidth()
                 )
 
-                // ——— PREGUNTA FINAL ———
+                // ⭐ TEXTO FINAL → REGISTRARSE
                 Text(
-                    text = "¿Ya cuentas con una cuenta registrada? Iniciar Sesión",
+                    text = "¿Aún no tienes una cuenta? Regístrate aquí",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Clic en "Registrarse"
+                Button(
+                    onClick = onRegisterClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary
+                    )
+                ) {
+                    Text("Crear cuenta", color = MaterialTheme.colorScheme.onTertiary)
+                }
+
+                // Loading
                 if (state is AuthState.Loading)
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
 
+                // Error
                 if (state is AuthState.Error)
                     Text(
                         text = "Error: ${state.message}",

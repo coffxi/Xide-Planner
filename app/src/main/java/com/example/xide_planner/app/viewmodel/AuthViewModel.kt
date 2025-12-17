@@ -1,9 +1,13 @@
 package com.example.xide_planner.app.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,7 +40,11 @@ class AuthViewModel : ViewModel() {
 
         viewModelScope.launch {
             auth.signInWithCredential(credential)
-                .addOnSuccessListener {
+                .addOnSuccessListener { result ->
+                    val user = result.user
+                    if (user != null) {
+                        saveUserToFirestore(user)   // ⭐ SE GUARDA EN FIRESTORE ⭐
+                    }
                     _uiState.value = AuthState.Success
                 }
                 .addOnFailureListener {
@@ -48,6 +56,29 @@ class AuthViewModel : ViewModel() {
     // 🔹 Si Google Sign-In falla antes de Firebase
     fun onGoogleSignInError(error: String) {
         _uiState.value = AuthState.Error(error)
+    }
+
+    // --------------------------------------------------------
+    // ⭐⭐⭐ GUARDA A TU USUARIO EN FIRESTORE ⭐⭐⭐
+    // --------------------------------------------------------
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveUserToFirestore(user: FirebaseUser) {
+        val db = FirebaseFirestore.getInstance()
+
+        val userDoc = db.collection("users").document(user.uid)
+
+        val data = mapOf(
+            "uid" to user.uid,
+            "name" to user.displayName,
+            "email" to user.email,
+            "photo" to user.photoUrl?.toString()
+        )
+
+        userDoc.get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists()) {
+                userDoc.set(data) // ✔️ lo crea solo si no existe
+            }
+        }
     }
 }
 

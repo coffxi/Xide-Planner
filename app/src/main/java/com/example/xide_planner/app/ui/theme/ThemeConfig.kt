@@ -6,5 +6,6 @@ data class ThemeConfig(
     val primaryColor: Color,
     val onPrimaryColor: Color,
     val borderColor: Color,
-    val backgroundImageRes: Int
+    val backgroundImageRes: Int,
+    val primaryText: Color = Color.Black,
 )

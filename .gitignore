@@ -1,15 +1,19 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Google Services (Firebase)
+google-services.json
+app/google-services.json
+
+# Local config
 local.properties
+
+# Gradle
+.gradle/
+build/
+
+# IDE
+*.iml
+.idea/
+.DS_Store
+
+# NDK / CMake
+.externalNativeBuild/
+.cxx/

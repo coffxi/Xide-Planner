@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    // Google Services
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -47,10 +50,21 @@ android {
 }
 
 dependencies {
-
     // ---- Android Base ----
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+
+    // Firebase Auth
+    implementation("com.google.firebase:firebase-auth")
+
+    // Firestore (CORREGIDO)
+    implementation("com.google.firebase:firebase-firestore")
+
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     // ---- Compose ----
     implementation(libs.androidx.activity.compose)
@@ -61,8 +75,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
 
-
-    // ---- ViewModel para Compose (REQUIRED) ----
+    // ViewModel para Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.ui)
@@ -70,13 +83,14 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.compose.runtime)
 
+    implementation(libs.androidx.navigation.compose)
+
     // ---- Test ----
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

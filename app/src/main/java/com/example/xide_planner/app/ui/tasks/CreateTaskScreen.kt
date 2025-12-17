@@ -22,10 +22,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.xide_planner.app.R
 import com.example.xide_planner.app.ui.components.Button1
 import com.example.xide_planner.app.ui.components.CenteredInputField
 import com.example.xide_planner.app.ui.components.OptionRow
+import com.example.xide_planner.app.viewmodel.TasksViewModel
+import com.example.xide_planner.app.data.model.Task
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -76,7 +79,7 @@ fun CreateTaskScreen( onBack: () -> Unit) {
     var newTagName by remember { mutableStateOf("") }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateMillis ?: todayAtMidnight())
-    val listState = rememberLazyListState()
+    val tasksViewModel: TasksViewModel = viewModel()
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -95,7 +98,21 @@ fun CreateTaskScreen( onBack: () -> Unit) {
                 actions = {
                     Button1(
                         text = "Guardar",
-                        onClick = { },
+                        onClick = {
+                            val task = Task(
+                                id = "",
+                                name = taskName,
+                                colorIndex = selectedColorIndex,
+                                dateMillis = selectedDateMillis,
+                                repeat = repeatOption,
+                                time = selectedTime,
+                                reminder = reminderOption,
+                                tag = tagsOption
+                            )
+
+                            tasksViewModel.saveTask(task)
+                            onBack()
+                        },
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 },

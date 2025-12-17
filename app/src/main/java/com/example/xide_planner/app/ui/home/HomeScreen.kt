@@ -11,8 +11,10 @@ import com.example.xide_planner.app.ui.components.BottomBar
 import com.example.xide_planner.app.ui.components.DashboardCard
 import com.example.xide_planner.app.ui.components.HomeTabs
 import com.example.xide_planner.app.ui.components.NotesPreviewList
+import com.example.xide_planner.app.ui.home.TasksPreviewList
 import com.example.xide_planner.app.R
 import com.example.xide_planner.app.viewmodel.NotesViewModel
+import com.example.xide_planner.app.viewmodel.TasksViewModel
 
 @Composable
 fun HomeScreen(
@@ -23,11 +25,19 @@ fun HomeScreen(
     onTasksClick: () -> Unit,
     onConfigClick: () -> Unit
 ) {
-    val notesViewModel: NotesViewModel = viewModel()
-    val notes by notesViewModel.notes.collectAsState()
 
+    // ViewModels
+    val notesViewModel: NotesViewModel = viewModel()
+    val tasksViewModel: TasksViewModel = viewModel()
+
+    // States
+    val notes by notesViewModel.notes.collectAsState()
+    val tasks by tasksViewModel.tasks.collectAsState()
+
+    // Cargar datos iniciales
     LaunchedEffect(Unit) {
         notesViewModel.loadNotes()
+        tasksViewModel.loadTasks()
     }
 
     var selectedTab by remember { mutableStateOf(HomeSection.TASKS) }
@@ -41,6 +51,7 @@ fun HomeScreen(
         },
         containerColor = Color(0xFFF6E8F1)
     ) { padding ->
+
         Column(
             Modifier
                 .padding(padding)
@@ -62,10 +73,10 @@ fun HomeScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    DashboardCard(
-                        title = "Tareas pendientes",
-                        description = "No hay tareas pendientes",
-                        icon = R.drawable.tareas1
+                    TasksPreviewList(
+                        tasks = tasks,
+                        onDelete = { tasks -> tasksViewModel.deleteTask(tasks.id) },
+                        onEdit = { /* abrir pantalla editar */ }
                     )
                 }
 
@@ -74,9 +85,10 @@ fun HomeScreen(
 
                     DashboardCard(
                         title = "Notas",
-                        description =
-                            if (notesCount == 0) "No hay notas registradas"
-                            else "Tienes $notesCount notas",
+                        description = if (notesCount == 0)
+                            "No hay notas registradas"
+                        else
+                            "Tienes $notesCount notas",
                         icon = R.drawable.tareas1
                     )
 
@@ -85,7 +97,7 @@ fun HomeScreen(
                     NotesPreviewList(
                         notes = notes,
                         onDelete = { note -> notesViewModel.deleteNote(note.id) },
-                        onEdit = { /* luego abrimos pantalla de edición */ }
+                        onEdit = { /* abrir pantalla editar */ }
                     )
                 }
 
@@ -100,5 +112,6 @@ fun HomeScreen(
         }
     }
 }
+
 
 enum class HomeSection { TASKS, NOTES, EMOTIONS }

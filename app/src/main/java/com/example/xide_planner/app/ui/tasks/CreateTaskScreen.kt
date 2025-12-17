@@ -31,7 +31,7 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateTaskScreen() {
+fun CreateTaskScreen( onBack: () -> Unit) {
     val circleIcons = listOf(
         R.drawable.rosa,
         R.drawable.morado,
@@ -84,7 +84,7 @@ fun CreateTaskScreen() {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Cerrar",

@@ -72,13 +72,15 @@ fun AppNavGraph(
                 onCalendarClick = {},
                 onMoodClick = {},
                 onTasksClick = {},
-                onConfigClick = {}
+                onConfigClick={}
             )
         }
 
         // ⭐ CREATE TASK (sin parámetros)
         composable("create_task") {
-            CreateTaskScreen()
+            CreateTaskScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
 
         // ⭐ CREATE NOTE (sin parámetros)

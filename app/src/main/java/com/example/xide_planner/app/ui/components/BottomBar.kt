@@ -16,7 +16,11 @@ import com.example.xide_planner.app.R
 @Composable
 fun BottomBar(
     onAddTaskClick: () -> Unit = {},
-    onAddNoteClick: () -> Unit = {}
+    onAddNoteClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onCalendarClick: () -> Unit = {},
+    onMoodClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
     val iconSize = 28.dp
     val calendarSize = 32.dp
@@ -27,66 +31,102 @@ fun BottomBar(
         modifier = Modifier.height(70.dp)
     ) {
 
-        // HOME
-        NavigationBarItem(
-            selected = true,
-            onClick = {},
-            icon = { Icon(painterResource(id = R.drawable.home_icon), null, Modifier.size(iconSize)) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.DarkGray,
-                unselectedIconColor = Color.DarkGray
-            )
-        )
-
-        // CALENDAR
+        // 🏠 HOME
         NavigationBarItem(
             selected = false,
-            onClick = {},
-            icon = { Icon(painterResource(id = R.drawable.calendar_icon), null, Modifier.size(calendarSize)) },
+            onClick = onHomeClick,
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.home_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.DarkGray,
                 unselectedIconColor = Color.DarkGray
             )
         )
 
-        // ⭐ NOTA → CreateNoteScreen
+        // 📅 CALENDARIO
+        NavigationBarItem(
+            selected = false,
+            onClick = onCalendarClick,
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.calendar_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(calendarSize)
+                )
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color.DarkGray,
+                unselectedIconColor = Color.DarkGray
+            )
+        )
+
+        // 📝 NOTAS → CreateNoteScreen
         NavigationBarItem(
             selected = false,
             onClick = onAddNoteClick,
-            icon = { Icon(painterResource(id = R.drawable.notas_icon), null, Modifier.size(iconSize)) },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.notas_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.DarkGray,
                 unselectedIconColor = Color.DarkGray
             )
         )
 
-        // EMOCIONES
+        // 😄 MOOD / EMOCIONES
         NavigationBarItem(
             selected = false,
-            onClick = {},
-            icon = { Icon(painterResource(id = R.drawable.mood_icon), null, Modifier.size(iconSize)) },
+            onClick = onMoodClick,
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.mood_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.DarkGray,
                 unselectedIconColor = Color.DarkGray
             )
         )
 
-        // ⭐ ACTIVIDAD → CreateTaskScreen
+        // 📌 TAREAS → CreateTaskScreen
         NavigationBarItem(
             selected = false,
             onClick = onAddTaskClick,
-            icon = { Icon(painterResource(id = R.drawable.task_icon), null, Modifier.size(iconSize)) },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.task_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.DarkGray,
                 unselectedIconColor = Color.DarkGray
             )
         )
 
-        // CONFIGURACIÓN
+        // ⚙️ CONFIGURACIÓN → SettingsScreen
         NavigationBarItem(
             selected = false,
-            onClick = {},
-            icon = { Icon(painterResource(id = R.drawable.confi_icon), null, Modifier.size(iconSize)) },
+            onClick = onSettingsClick,
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.confi_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(iconSize)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color.DarkGray,
                 unselectedIconColor = Color.DarkGray

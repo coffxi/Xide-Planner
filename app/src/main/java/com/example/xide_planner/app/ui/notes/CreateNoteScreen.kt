@@ -90,7 +90,7 @@ fun CreateNoteScreen(
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Cerrar",

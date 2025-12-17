@@ -1,8 +1,8 @@
 package com.example.xide_planner.app.data.model
 
-import androidx.compose.ui.text.AnnotatedString
-
 data class Note(
-    val title: String,
-    val content: AnnotatedString
+    val id: String = "",
+    val title: String = "",
+    val content: String = "",
+    val timestamp: Long = System.currentTimeMillis()
 )

@@ -4,10 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.xide_planner.app.data.model.Note
 import com.example.xide_planner.app.ui.auth.RegisterScreen
 import com.example.xide_planner.app.ui.auth.LoginScreen
 import com.example.xide_planner.app.ui.home.HomeScreen
 import com.example.xide_planner.app.ui.auth.WelcomeScreen
+import com.example.xide_planner.app.ui.tasks.CreateTaskScreen
+import com.example.xide_planner.app.ui.notes.CreateNoteScreen
 import com.example.xide_planner.app.viewmodel.AuthState
 
 @Composable
@@ -16,6 +19,7 @@ fun AppNavGraph(
     authState: AuthState,
     onGoogleClick: () -> Unit
 ) {
+
     NavHost(
         navController = navController,
         startDestination = "welcome"
@@ -60,9 +64,28 @@ fun AppNavGraph(
             )
         }
 
-        // ⭐ HOME (después del login/registro)
+        // ⭐ HOME
         composable("home") {
-            HomeScreen()
+            HomeScreen(
+                onAddTask = { navController.navigate("create_task") },
+                onAddNote = { navController.navigate("create_note") },
+                onCalendarClick = {},
+                onMoodClick = {},
+                onTasksClick = {},
+                onConfigClick = {}
+            )
+        }
+
+        // ⭐ CREATE TASK (sin parámetros)
+        composable("create_task") {
+            CreateTaskScreen()
+        }
+
+        // ⭐ CREATE NOTE (sin parámetros)
+        composable("create_note") {
+            CreateNoteScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.xide_planner.app.ui.notes
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.TextRange
@@ -23,10 +25,21 @@ import androidx.compose.ui.unit.sp
 import com.example.xide_planner.app.ui.components.CenteredInputField
 import com.example.xide_planner.app.ui.components.NoteEditorBottomBar
 import com.example.xide_planner.app.ui.components.TextFormatPanel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
+import com.example.xide_planner.app.data.model.Note
+import com.example.xide_planner.app.data.repository.NotesRepository
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateNoteScreen() {
+fun CreateNoteScreen(
+    onBack: () -> Unit
+) {
+    val repository = NotesRepository()
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     var noteTitle by remember { mutableStateOf("") }
     var noteText by remember { mutableStateOf(TextFieldValue("")) }
@@ -51,6 +64,8 @@ fun CreateNoteScreen() {
         background = highlightColor
     )
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     fun applyStyleToSelection(style: SpanStyle) {
         val selection = noteText.selection
 
@@ -69,6 +84,7 @@ fun CreateNoteScreen() {
         noteText = noteText.copy(annotatedString = newAnnotated)
     }
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },   // ← NUEVO
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
@@ -99,9 +115,20 @@ fun CreateNoteScreen() {
                         noteText = redoStack.removeAt(redoStack.lastIndex)
                     } },
                     onSave = {
-                        val savedAnnotatedText = noteText.annotatedString
-                        val title = noteTitle
-                        // guardar luego
+                        coroutineScope.launch {
+                            val success = repository.saveNote(
+                                Note(
+                                    title = noteTitle,
+                                    content = noteText.text
+                                )
+                            )
+                            if (success) {
+                                Toast.makeText(context, "Nota guardada ✨", Toast.LENGTH_SHORT).show()
+                                onBack()
+                            } else {
+                                Toast.makeText(context, "Error al guardar 😭", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 )
 
@@ -123,7 +150,7 @@ fun CreateNoteScreen() {
                         onTextColorSelected = { selectedColor ->
                             textColor = selectedColor
                             applyStyleToSelection(SpanStyle(color = selectedColor)) },
-                                selectedHighlightColor = highlightColor,
+                        selectedHighlightColor = highlightColor,
                         onHighlightColorSelected = { selectedColor ->
                             highlightColor = selectedColor
                             applyStyleToSelection(SpanStyle(background = selectedColor)) }

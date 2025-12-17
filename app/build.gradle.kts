@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
 
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.room.common.jvm)
 
     // ---- Test ----
     testImplementation(libs.junit)

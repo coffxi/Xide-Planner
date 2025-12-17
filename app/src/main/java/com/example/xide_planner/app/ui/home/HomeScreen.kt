@@ -1,76 +1,99 @@
 package com.example.xide_planner.app.ui.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.xide_planner.app.ui.components.BottomBar
 import com.example.xide_planner.app.ui.components.DashboardCard
 import com.example.xide_planner.app.ui.components.HomeTabs
+import com.example.xide_planner.app.ui.components.NotesPreviewList
 import com.example.xide_planner.app.R
+import com.example.xide_planner.app.viewmodel.NotesViewModel
 
 @Composable
 fun HomeScreen(
-    onAddTask: () -> Unit = {}
+    onAddTask: () -> Unit,
+    onAddNote: () -> Unit,
+    onCalendarClick: () -> Unit,
+    onMoodClick: () -> Unit,
+    onTasksClick: () -> Unit,
+    onConfigClick: () -> Unit
 ) {
+    val notesViewModel: NotesViewModel = viewModel()
+    val notes by notesViewModel.notes.collectAsState()
+
+    LaunchedEffect(Unit) {
+        notesViewModel.loadNotes()
+    }
+
     var selectedTab by remember { mutableStateOf(HomeSection.TASKS) }
 
     Scaffold(
-        bottomBar = { BottomBar(onAddTask = onAddTask) },
+        bottomBar = {
+            BottomBar(
+                onAddTaskClick = onAddTask,
+                onAddNoteClick = onAddNote
+            )
+        },
         containerColor = Color(0xFFF6E8F1)
     ) { padding ->
-
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF6E8F1))
+            Modifier
                 .padding(padding)
                 .padding(16.dp)
         ) {
 
-            // ---------- TABS ----------
-            HomeTabs(
-                selected = selectedTab,
-                onSelect = { selectedTab = it }
-            )
+            HomeTabs(selected = selectedTab, onSelect = { selectedTab = it })
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // ---------- CONTENIDO POR TAB ----------
             when (selectedTab) {
 
                 HomeSection.TASKS -> {
                     DashboardCard(
                         title = "Reporte semanal",
                         description = "No hay eventos próximos",
-                        icon = R.drawable.tareas1   // ← pon el ícono correcto
+                        icon = R.drawable.tareas1
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     DashboardCard(
                         title = "Tareas pendientes",
                         description = "No hay tareas pendientes",
-                        icon = R.drawable.tareas1    // ← pon el ícono correcto
+                        icon = R.drawable.tareas1
                     )
                 }
 
                 HomeSection.NOTES -> {
+                    val notesCount = notes.size
+
                     DashboardCard(
                         title = "Notas",
-                        description = "No hay notas registradas",
-                        icon = R.drawable.tareas1     // ← tu ícono
+                        description =
+                            if (notesCount == 0) "No hay notas registradas"
+                            else "Tienes $notesCount notas",
+                        icon = R.drawable.tareas1
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    NotesPreviewList(
+                        notes = notes,
+                        onDelete = { note -> notesViewModel.deleteNote(note.id) },
+                        onEdit = { /* luego abrimos pantalla de edición */ }
                     )
                 }
 
                 HomeSection.EMOTIONS -> {
                     DashboardCard(
                         title = "Emociones",
-                        description = "Aún no registras una emoción",
-                        icon = R.drawable.tareas1 // ← tu ícono
+                        description = "Aún no registras emociones",
+                        icon = R.drawable.tareas1
                     )
                 }
             }
